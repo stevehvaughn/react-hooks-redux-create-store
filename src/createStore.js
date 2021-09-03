@@ -1,28 +1,49 @@
-let state;
+function createStore(reducer) {
+  let state;
+  
+  function dispatch(action) {
+    state = reducer(state, action);
+    render();
+  }
 
-function reducer(state = { count: 0 }, action) {
-  switch (action.type) {
-    case "counter/increment":
-      return { count: state.count + 1 };
+  function getState() {
+    return state;
+  }
 
-    default:
-      return state;
+  return { 
+    dispatch,
+    getState
   }
 }
 
-function dispatch(action) {
-  state = reducer(state, action);
-  render();
-}
 
-function render() {
-  let container = document.getElementById("container");
-  container.textContent = state.count;
-}
+function counterReducer(state = { count: 0 }, action) {
+  switch (action.type) {
+    case "counter/increment":
+      return { count: state.count + 1 };
+    case "counter/decrement":
+      return { count: state.count - 1};
+      
+      default:
+        return state;
+      }
+    }
+    
+    
+    function render() {
+      let container = document.getElementById("container");
+      container.textContent = store.getState().count;
+    }
+    
+let store = createStore(counterReducer)
+store.dispatch({ type: "@@INIT" })
 
-dispatch({ type: "@@INIT" });
-let button = document.getElementById("button");
+let plusButton = document.getElementById("plus-button");
+plusButton.addEventListener("click", function () {
+  store.dispatch({ type: "counter/increment" });
+});
 
-button.addEventListener("click", function () {
-  dispatch({ type: "counter/increment" });
+let minusButton = document.getElementById("minus-button");
+minusButton.addEventListener("click", function () {
+  store.dispatch({ type: "counter/decrement" });
 });
